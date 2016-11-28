@@ -1,24 +1,23 @@
 package org.byu.cs452.persistence;
 
-
 import com.datastax.driver.core.Row;
 
 /**
  * @author blissrj
  */
 @SuppressWarnings("ALL")
-public class Student {
+public class Instructor {
   public static final String ID = "ID";
   public static final String NAME = "name";
   public static final String DEPARTMENT_NAME = "dept_name";
-  public static final String TOTAL_CREDITS = "tot_cred";
+  public static final String SALARY = "salary";
 
-  public static final String TABLE_NAME = "student";
+  public static final String TABLE_NAME = "instructor";
 
   private String id;
   private String name;
   private String departmentName;
-  private int totalCredits;
+  private int salary;
 
   public String getId() {
     return id;
@@ -44,12 +43,12 @@ public class Student {
     this.departmentName = departmentName;
   }
 
-  public int getTotalCredits() {
-    return totalCredits;
+  public int getSalary() {
+    return salary;
   }
 
-  public void setTotalCredits(int totalCredits) {
-    this.totalCredits = totalCredits;
+  public void setSalary(int salary) {
+    this.salary = salary;
   }
 
   public static String tableName() {
@@ -57,15 +56,15 @@ public class Student {
   }
 
   public static String columnNames() {
-    return String.join(",", ID, NAME, DEPARTMENT_NAME, TOTAL_CREDITS);
+    return String.join(",", ID, NAME, DEPARTMENT_NAME, SALARY);
   }
 
-  public static Student getInstance(Row row) {
-    Student student = new Student();
-      student.setId(row.getString(ID));
-      student.setName(row.getString(NAME));
-      student.setDepartmentName(row.getString(DEPARTMENT_NAME));
-      student.setTotalCredits(row.getInt(TOTAL_CREDITS));
-      return student;
+  public static Instructor getInstance(Row row) {
+    Instructor instructor = new Instructor();
+    instructor.setId(row.getString(ID));
+    instructor.setName(row.getString(NAME));
+    instructor.setDepartmentName(row.getString(DEPARTMENT_NAME));
+    instructor.setSalary(row.getInt(SALARY));
+    return instructor;
   }
 }

@@ -7,18 +7,18 @@ import java.sql.SQLException;
  * @author blissrj
  */
 @SuppressWarnings("ALL")
-public class PgStudent {
+public class PgInstructor {
   public static final String ID = "ID";
   public static final String NAME = "name";
   public static final String DEPARTMENT_NAME = "dept_name";
-  public static final String TOTAL_CREDITS = "tot_cred";
+  public static final String SALARY = "salary";
 
-  public static final String TABLE_NAME = "student";
+  public static final String TABLE_NAME = "instructor";
 
   private String id;
   private String name;
   private String departmentName;
-  private int totalCredits;
+  private int salary;
 
   public String getId() {
     return id;
@@ -44,12 +44,12 @@ public class PgStudent {
     this.departmentName = departmentName;
   }
 
-  public int getTotalCredits() {
-    return totalCredits;
+  public int getSalary() {
+    return salary;
   }
 
-  public void setTotalCredits(int totalCredits) {
-    this.totalCredits = totalCredits;
+  public void setSalary(int salary) {
+    this.salary = salary;
   }
 
   public static String tableName() {
@@ -57,17 +57,17 @@ public class PgStudent {
   }
 
   public static String columnNames() {
-    return String.join(",", ID, NAME, DEPARTMENT_NAME, TOTAL_CREDITS);
+    return String.join(",", ID, NAME, DEPARTMENT_NAME, SALARY);
   }
 
-  public static PgStudent getInstance(ResultSet resultSet) {
-    PgStudent student = new PgStudent();
+  public static PgInstructor getInstance(ResultSet resultSet) {
+    PgInstructor instructor = new PgInstructor();
     try {
-      student.setId(resultSet.getString(ID));
-      student.setName(resultSet.getString(NAME));
-      student.setDepartmentName(resultSet.getString(DEPARTMENT_NAME));
-      student.setTotalCredits(resultSet.getInt(TOTAL_CREDITS));
-      return student;
+      instructor.setId(resultSet.getString(ID));
+      instructor.setName(resultSet.getString(NAME));
+      instructor.setDepartmentName(resultSet.getString(DEPARTMENT_NAME));
+      instructor.setSalary(resultSet.getInt(SALARY));
+      return instructor;
     }
     catch (SQLException e) {
       throw new RuntimeException("Failed to populate PgStudent from ResultSet", e);

@@ -7,22 +7,20 @@ import java.sql.SQLException;
  * @author blissrj
  */
 @SuppressWarnings("ALL")
-public class PgTakes {
+public class PgTeaches {
   public static final String ID = "ID";
   public static final String COURSE_ID = "course_id";
   public static final String SECTION_ID = "sec_id";
   public static final String SEMESTER = "semester";
   public static final String YEAR = "year";
-  public static final String GRADE = "grade";
 
-  public static final String TABLE_NAME = "takes";
+  public static final String TABLE_NAME = "teaches";
 
   private String id;
   private String course_id;
   private String section_id;
   private String semester;
   private int year;
-  private String grade;
 
   public String getId() {
     return id;
@@ -64,34 +62,27 @@ public class PgTakes {
     this.year = year;
   }
 
-  public String getGrade() {
-    return grade;
-  }
-
-  public void setGrade(String grade) {
-    this.grade = grade;
-  }
   public static String tableName() {
     return TABLE_NAME;
   }
 
   public static String columnNames() {
-    return String.join(",", ID, COURSE_ID, SECTION_ID, SEMESTER, YEAR, GRADE);
+    return String.join(",", ID, COURSE_ID, SECTION_ID, SEMESTER, YEAR);
   }
 
-  public static PgTakes getInstance(ResultSet resultSet) {
-    PgTakes takes = new PgTakes();
+  public static PgTeaches getInstance(ResultSet resultSet) {
+    PgTeaches teaches = new PgTeaches();
     try {
-      takes.setId(resultSet.getString(ID));
-      takes.setCourse_id(resultSet.getString(COURSE_ID));
-      takes.setSection_id(resultSet.getString(SECTION_ID));
-      takes.setSemester(resultSet.getString(SEMESTER));
-      takes.setYear(resultSet.getInt(YEAR));
-      takes.setGrade(resultSet.getString(GRADE));
-      return takes;
+      teaches.setId(resultSet.getString(ID));
+      teaches.setCourse_id(resultSet.getString(COURSE_ID));
+      teaches.setSection_id(resultSet.getString(SECTION_ID));
+      teaches.setSemester(resultSet.getString(SEMESTER));
+
+      teaches.setYear(resultSet.getInt(YEAR));
+      return teaches;
     }
     catch (SQLException e) {
-      throw new RuntimeException("Failed to populate PgTakes from ResultSet", e);
+      throw new RuntimeException("Failed to populate PgTeaches from ResultSet", e);
     }
   }
 }

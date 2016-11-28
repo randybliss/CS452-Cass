@@ -1,7 +1,6 @@
 package org.byu.cs452.persistence;
 
 import com.datastax.driver.core.*;
-import org.apache.cassandra.thrift.NotFoundException;
 import org.byu.cs452.persistence.cassandra.CassandraDatabaseOps;
 import org.byu.cs452.persistence.postgres.PgStudent;
 import org.byu.cs452.persistence.postgres.PgTakes;

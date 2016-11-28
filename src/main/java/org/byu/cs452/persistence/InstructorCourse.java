@@ -8,16 +8,15 @@ import java.util.UUID;
  * @author blissrj
  */
 @SuppressWarnings("ALL")
-public class StudentCourse {
+public class InstructorCourse {
   public static final String ID = "ID";
   public static final String RECORD_ID = "record_id";
   public static final String COURSE_ID = "course_id";
   public static final String SECTION_ID = "sec_id";
   public static final String SEMESTER = "semester";
   public static final String YEAR = "year";
-  public static final String GRADE = "grade";
 
-  public static final String TABLE_NAME = "studentCourses";
+  public static final String TABLE_NAME = "instructorCourses";
 
   private String id;
   private UUID recordId;
@@ -25,7 +24,6 @@ public class StudentCourse {
   private String sectionId;
   private String semester;
   private int year;
-  private String grade;
 
   public String getId() {
     return id;
@@ -75,30 +73,22 @@ public class StudentCourse {
     this.year = year;
   }
 
-  public String getGrade() {
-    return grade;
-  }
-
-  public void setGrade(String grade) {
-    this.grade = grade;
-  }
-
   public static String tableName() {
     return TABLE_NAME;
   }
+
   public static String columnNames() {
-    return String.join(",", ID, RECORD_ID, COURSE_ID, SECTION_ID, SEMESTER, YEAR, GRADE);
+    return String.join(",", ID, RECORD_ID, COURSE_ID, SECTION_ID, SEMESTER, YEAR);
   }
 
-  public static StudentCourse getInstance(Row row) {
-    StudentCourse studentCourse = new StudentCourse();
-    studentCourse.setId(row.getString(ID));
-    studentCourse.setRecordId(row.getUUID(RECORD_ID));
-    studentCourse.setCourseId(row.getString(COURSE_ID));
-    studentCourse.setSectionId(row.getString(SECTION_ID));
-    studentCourse.setSemester(row.getString(SEMESTER));
-    studentCourse.setYear(row.getInt(YEAR));
-    studentCourse.setGrade(row.getString(GRADE));
-    return studentCourse;
+  public static InstructorCourse getInstance(Row row) {
+    InstructorCourse instructorCourse = new InstructorCourse();
+    instructorCourse.setId(row.getString(ID));
+    instructorCourse.setRecordId(row.getUUID(RECORD_ID));
+    instructorCourse.setCourseId(row.getString(COURSE_ID));
+    instructorCourse.setSectionId(row.getString(SECTION_ID));
+    instructorCourse.setSemester(row.getString(SEMESTER));
+    instructorCourse.setYear(row.getInt(YEAR));
+    return instructorCourse;
   }
 }

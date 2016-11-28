@@ -35,7 +35,7 @@ public class CassandraDatabaseOps implements DatabaseOps {
 
     this.clusterBuilder = Cluster.builder()
         .withProtocolVersion(ProtocolVersion.V3) // V3 means client-side timestamps are used which are necessary for speculative execution.
-        .addContactPoints("localhost").withPort(9042)
+        .addContactPoints("127.0.0.1").withPort(9042)
         .withCredentials(username, password);
     Cluster cluster = this.clusterBuilder.build();
     try {
