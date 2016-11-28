@@ -1,4 +1,4 @@
-package org.byu.cs452.persistence;
+package org.byu.cs452.persistence.dataObjects;
 
 import com.datastax.driver.core.Row;
 

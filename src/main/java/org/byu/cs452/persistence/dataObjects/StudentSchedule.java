@@ -1,4 +1,4 @@
-package org.byu.cs452.persistence;
+package org.byu.cs452.persistence.dataObjects;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,16 +6,16 @@ import java.util.List;
 /**
  * @author blissrj
  */
-public class Schedule {
+public class StudentSchedule {
   private Student student;
-  private List<CourseFacade> schedule;
+  private List<StudentCourseFacade> schedule;
 
-  public Schedule(Student student) {
+  public StudentSchedule(Student student) {
     this.student = student;
     this.schedule = new ArrayList<>();
   }
 
-  public void addCourse(CourseFacade courseFacade) {
+  public void addCourse(StudentCourseFacade courseFacade) {
     this.schedule.add(courseFacade);
   }
 
@@ -23,7 +23,7 @@ public class Schedule {
     return student;
   }
 
-  public List<CourseFacade> getSchedule() {
+  public List<StudentCourseFacade> getSchedule() {
     return schedule;
   }
 }

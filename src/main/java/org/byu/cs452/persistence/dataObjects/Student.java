@@ -1,4 +1,5 @@
-package org.byu.cs452.persistence;
+package org.byu.cs452.persistence.dataObjects;
+
 
 import com.datastax.driver.core.Row;
 
@@ -6,18 +7,18 @@ import com.datastax.driver.core.Row;
  * @author blissrj
  */
 @SuppressWarnings("ALL")
-public class Instructor {
+public class Student {
   public static final String ID = "ID";
   public static final String NAME = "name";
   public static final String DEPARTMENT_NAME = "dept_name";
-  public static final String SALARY = "salary";
+  public static final String TOTAL_CREDITS = "tot_cred";
 
-  public static final String TABLE_NAME = "instructor";
+  public static final String TABLE_NAME = "student";
 
   private String id;
   private String name;
   private String departmentName;
-  private int salary;
+  private int totalCredits;
 
   public String getId() {
     return id;
@@ -43,12 +44,12 @@ public class Instructor {
     this.departmentName = departmentName;
   }
 
-  public int getSalary() {
-    return salary;
+  public int getTotalCredits() {
+    return totalCredits;
   }
 
-  public void setSalary(int salary) {
-    this.salary = salary;
+  public void setTotalCredits(int totalCredits) {
+    this.totalCredits = totalCredits;
   }
 
   public static String tableName() {
@@ -56,15 +57,15 @@ public class Instructor {
   }
 
   public static String columnNames() {
-    return String.join(",", ID, NAME, DEPARTMENT_NAME, SALARY);
+    return String.join(",", ID, NAME, DEPARTMENT_NAME, TOTAL_CREDITS);
   }
 
-  public static Instructor getInstance(Row row) {
-    Instructor instructor = new Instructor();
-    instructor.setId(row.getString(ID));
-    instructor.setName(row.getString(NAME));
-    instructor.setDepartmentName(row.getString(DEPARTMENT_NAME));
-    instructor.setSalary(row.getInt(SALARY));
-    return instructor;
+  public static Student getInstance(Row row) {
+    Student student = new Student();
+      student.setId(row.getString(ID));
+      student.setName(row.getString(NAME));
+      student.setDepartmentName(row.getString(DEPARTMENT_NAME));
+      student.setTotalCredits(row.getInt(TOTAL_CREDITS));
+      return student;
   }
 }

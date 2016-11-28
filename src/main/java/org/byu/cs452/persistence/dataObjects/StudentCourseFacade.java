@@ -1,16 +1,16 @@
-package org.byu.cs452.persistence;
+package org.byu.cs452.persistence.dataObjects;
 
 /**
  * @author blissrj
  */
-public class CourseFacade {
+public class StudentCourseFacade {
   private String courseId;
   private String section;
   private String semester;
   private int year;
   private String grade;
 
-  public CourseFacade(StudentCourse studentCourse) {
+  public StudentCourseFacade(StudentCourse studentCourse) {
     this.courseId = studentCourse.getCourseId();
     this.section = studentCourse.getSectionId();
     this.semester = studentCourse.getSemester();

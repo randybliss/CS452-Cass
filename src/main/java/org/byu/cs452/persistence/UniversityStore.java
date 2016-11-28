@@ -2,9 +2,11 @@ package org.byu.cs452.persistence;
 
 import com.datastax.driver.core.*;
 import org.byu.cs452.persistence.cassandra.CassandraDatabaseOps;
-import org.byu.cs452.persistence.postgres.PgStudent;
-import org.byu.cs452.persistence.postgres.PgTakes;
-import org.byu.cs452.persistence.postgres.PostgresDatabaseOps;
+import org.byu.cs452.persistence.dataObjects.Instructor;
+import org.byu.cs452.persistence.dataObjects.InstructorCourse;
+import org.byu.cs452.persistence.dataObjects.Student;
+import org.byu.cs452.persistence.dataObjects.StudentCourse;
+import org.byu.cs452.persistence.postgres.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +31,17 @@ public class UniversityStore {
           "PRIMARY KEY((ID), record_id))"
       , StudentCourse.tableName());
 
+  private static final String CREATE_INSTRUCTOR_CQL_STMT = String.format(
+      "CREATE TABLE IF NOT EXISTS %1$s (" +
+          "ID TEXT, name TEXT, dept_name TEXT, salary INT, PRIMARY KEY(ID))"
+      , Instructor.tableName());
+
+  private static final String CREATE_INSTRUCTOR_COURSES_CQL_STMT = String.format(
+      "CREATE TABLE IF NOT EXISTS %1$s (" +
+          "ID TEXT, record_id TIMEUUID, course_id TEXT, sec_id TEXT, semester TEXT, year INT, " +
+          "PRIMARY KEY((ID), record_id))"
+      , InstructorCourse.tableName());
+
   private CassandraDatabaseOps cassandraDatabaseOps;
   private PostgresDatabaseOps postgresDatabaseOps;
   private Session session;
@@ -44,6 +57,12 @@ public class UniversityStore {
     this.session = cassandraDatabaseOps.getSession();
     ensureTableCreated(CREATE_STUDENT_CQL_STMT);
     ensureTableCreated(CREATE_STUDENT_COURSES_CQL_STMT);
+    ensureTableCreated(CREATE_INSTRUCTOR_CQL_STMT);
+    ensureTableCreated(CREATE_INSTRUCTOR_COURSES_CQL_STMT);
+  }
+
+  private void ensureTableCreated(String cqlStatementString) {
+    session.execute(cqlStatementString);
   }
 
   public Student readStudent(String id) {
@@ -68,6 +87,7 @@ public class UniversityStore {
     return students;
   }
 
+  @SuppressWarnings("WeakerAccess")
   public void writeStudent(Student student) {
     String cqlString = String.format("INSERT INTO %1$s (%2$s) VALUES(?,?,?,?)", Student.tableName(), Student.columnNames());
     PreparedStatement preparedStatement = session.prepare(cqlString);
@@ -90,6 +110,7 @@ public class UniversityStore {
     return studentCourses;
   }
 
+  @SuppressWarnings("WeakerAccess")
   public void writeStudentCourse(StudentCourse studentCourse) {
     String cqlString = String.format("INSERT INTO %1$s (%2$s) VALUES(?,now(),?,?,?,?,?)", StudentCourse.tableName(), StudentCourse.columnNames());
     PreparedStatement preparedStatement = session.prepare(cqlString);
@@ -102,11 +123,78 @@ public class UniversityStore {
         studentCourse.getGrade());
     ResultSet resultSet = session.execute(insertStatement);
     if (!resultSet.wasApplied()) {
-      throw new RuntimeException("Insert studentCourse failed");
+      throw new RuntimeException("Insert instructorCourse failed");
+    }
+  }
+
+  public Instructor readInstructor(String id) {
+    String cqlString = String.format("SELECT %1$s FROM %2$s WHERE id=?", Instructor.columnNames(), Instructor.tableName());
+    PreparedStatement preparedStatement = session.prepare(cqlString);
+    Statement selectStatement = preparedStatement.bind(id);
+    ResultSet resultSet = session.execute(selectStatement);
+    Row row = resultSet.one();
+    if (row == null) {
+      throw new RecordNotFoundException(String.format("Record not found for student id: %1$s", id));
+    }
+    return Instructor.getInstance(row);
+  }
+
+  public List<Instructor> readInstructors() {
+    List<Instructor> instructors = new ArrayList<>();
+    String cqlString = String.format("SELECT %1$s FROM %2$s", Instructor.columnNames(), Instructor.tableName());
+    ResultSet resultSet = session.execute(cqlString);
+    for (Row row : resultSet) {
+      instructors.add(Instructor.getInstance(row));
+    }
+    return instructors;
+  }
+
+  @SuppressWarnings("WeakerAccess")
+  public void writeInstructor(Instructor instructor) {
+    String cqlString = String.format("INSERT INTO %1$s (%2$s) VALUES(?,?,?,?)", Instructor.tableName(), Instructor.columnNames());
+    PreparedStatement preparedStatement = session.prepare(cqlString);
+    Statement insertStatement = preparedStatement.bind(instructor.getId(), instructor.getName(), instructor.getDepartmentName(), instructor.getSalary());
+    ResultSet resultSet = session.execute(insertStatement);
+    if (!resultSet.wasApplied()) {
+      throw new RuntimeException("Insert student failed");
+    }
+  }
+
+  public List<InstructorCourse> readInstructorCourses(String id) {
+    List<InstructorCourse> instructorCourses = new ArrayList<>();
+    String cqlString = String.format("SELECT %1$s FROM %2$s WHERE ID=?", InstructorCourse.columnNames(), InstructorCourse.tableName());
+    PreparedStatement preparedStatement = session.prepare(cqlString);
+    Statement selectStatement = preparedStatement.bind(id);
+    ResultSet resultSet = session.execute(selectStatement);
+    for (Row row : resultSet) {
+      instructorCourses.add(InstructorCourse.getInstance(row));
+    }
+    return instructorCourses;
+  }
+
+  @SuppressWarnings("WeakerAccess")
+  public void writeInstructorCourse(InstructorCourse instructorCourse) {
+    String cqlString = String.format("INSERT INTO %1$s (%2$s) VALUES(?,now(),?,?,?,?)", InstructorCourse.tableName(), InstructorCourse.columnNames());
+    PreparedStatement preparedStatement = session.prepare(cqlString);
+    Statement insertStatement = preparedStatement.bind(
+        instructorCourse.getId(),
+        instructorCourse.getCourseId(),
+        instructorCourse.getSectionId(),
+        instructorCourse.getSemester(),
+        instructorCourse.getYear());
+    ResultSet resultSet = session.execute(insertStatement);
+    if (!resultSet.wasApplied()) {
+      throw new RuntimeException("Insert instructorCourse failed");
     }
   }
 
   public String slurp() {
+    slurpStudentData();
+    slurpInstructorData();
+    return "SUCCESS";
+  }
+
+  private void slurpStudentData() {
     try (Connection conn = postgresDatabaseOps.getConnection()){
       //Copy postgreSQL student table to Cassandra student table
       String sqlString = String.format("SELECT %1$s FROM %2$s", PgStudent.columnNames(), PgStudent.tableName());
@@ -140,10 +228,40 @@ public class UniversityStore {
     catch (SQLException e) {
       throw new RuntimeException("Unexpected database exception attempting to read postgres students", e);
     }
-    return "SUCCESS";
   }
 
-  private void ensureTableCreated(String cqlStatementString) {
-    session.execute(cqlStatementString);
+  private void slurpInstructorData() {
+    try (Connection conn = postgresDatabaseOps.getConnection()){
+      //Copy postgreSQL instructor table to Cassandra instructor table
+      String sqlString = String.format("SELECT %1$s FROM %2$s", PgInstructor.columnNames(), PgInstructor.tableName());
+      java.sql.PreparedStatement statement = conn.prepareStatement(sqlString);
+      java.sql.ResultSet resultSet = statement.executeQuery();
+      while (resultSet.next()) {
+        PgInstructor pgInstructor = PgInstructor.getInstance(resultSet);
+        Instructor instructor = new Instructor();
+        instructor.setId(pgInstructor.getId());
+        instructor.setName(pgInstructor.getName());
+        instructor.setDepartmentName(pgInstructor.getDepartmentName());
+        instructor.setSalary(pgInstructor.getSalary());
+        writeInstructor(instructor);
+      }
+      //Copy postgreSQL teaches table to Cassandra instructorCourses table
+      sqlString = String.format("SELECT %1$s FROM %2$s order by year ASC, semester ASC", PgTeaches.columnNames(), PgTeaches.tableName());
+      statement = conn.prepareStatement(sqlString);
+      resultSet = statement.executeQuery();
+      while (resultSet.next())  {
+        PgTeaches teaches = PgTeaches.getInstance(resultSet);
+        InstructorCourse instructorCourse = new InstructorCourse();
+        instructorCourse.setId(teaches.getId());
+        instructorCourse.setCourseId(teaches.getCourse_id());
+        instructorCourse.setSectionId(teaches.getSection_id());
+        instructorCourse.setSemester(teaches.getSemester());
+        instructorCourse.setYear(teaches.getYear());
+        writeInstructorCourse(instructorCourse);
+      }
+    }
+    catch (SQLException e) {
+      throw new RuntimeException("Unexpected database exception attempting to read postgres students", e);
+    }
   }
 }
