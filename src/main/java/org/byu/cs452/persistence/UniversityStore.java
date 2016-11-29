@@ -1,6 +1,7 @@
 package org.byu.cs452.persistence;
 
 import com.datastax.driver.core.*;
+import org.apache.commons.lang3.StringUtils;
 import org.byu.cs452.persistence.cassandra.CassandraDatabaseOps;
 import org.byu.cs452.persistence.dataObjects.Instructor;
 import org.byu.cs452.persistence.dataObjects.InstructorCourse;
@@ -20,28 +21,7 @@ import java.util.List;
  */
 @Service
 public class UniversityStore {
-  private static final String CREATE_STUDENT_CQL_STMT = String.format(
-      "CREATE TABLE IF NOT EXISTS %1$s (" +
-          "ID TEXT, name TEXT, dept_name TEXT, tot_cred INT, PRIMARY KEY(ID))"
-      , Student.tableName());
-
-  private static final String CREATE_STUDENT_COURSES_CQL_STMT = String.format(
-      "CREATE TABLE IF NOT EXISTS %1$s (" +
-          "ID TEXT, record_id TIMEUUID, course_id TEXT, sec_id TEXT, semester TEXT, year INT, grade TEXT, " +
-          "PRIMARY KEY((ID), record_id))"
-      , StudentCourse.tableName());
-
-  private static final String CREATE_INSTRUCTOR_CQL_STMT = String.format(
-      "CREATE TABLE IF NOT EXISTS %1$s (" +
-          "ID TEXT, name TEXT, dept_name TEXT, salary INT, PRIMARY KEY(ID))"
-      , Instructor.tableName());
-
-  private static final String CREATE_INSTRUCTOR_COURSES_CQL_STMT = String.format(
-      "CREATE TABLE IF NOT EXISTS %1$s (" +
-          "ID TEXT, record_id TIMEUUID, course_id TEXT, sec_id TEXT, semester TEXT, year INT, " +
-          "PRIMARY KEY((ID), record_id))"
-      , InstructorCourse.tableName());
-
+  @SuppressWarnings({"FieldCanBeLocal", "unused"})
   private CassandraDatabaseOps cassandraDatabaseOps;
   private PostgresDatabaseOps postgresDatabaseOps;
   private Session session;
@@ -50,19 +30,21 @@ public class UniversityStore {
   public UniversityStore(CassandraDatabaseOps cassandraDatabaseOps, PostgresDatabaseOps postgresDatabaseOps) {
     this.cassandraDatabaseOps = cassandraDatabaseOps;
     this.postgresDatabaseOps = postgresDatabaseOps;
-    init();
-  }
-
-  private void init() {
     this.session = cassandraDatabaseOps.getSession();
-    ensureTableCreated(CREATE_STUDENT_CQL_STMT);
-    ensureTableCreated(CREATE_STUDENT_COURSES_CQL_STMT);
-    ensureTableCreated(CREATE_INSTRUCTOR_CQL_STMT);
-    ensureTableCreated(CREATE_INSTRUCTOR_COURSES_CQL_STMT);
+    ensureTablesCreated();
   }
 
-  private void ensureTableCreated(String cqlStatementString) {
-    session.execute(cqlStatementString);
+  private void ensureTablesCreated() {
+    createTable(Student.CREATE_STUDENT_CQL_STMT);
+    createTable(StudentCourse.CREATE_STUDENT_COURSES_CQL_STMT);
+    createTable(Instructor.CREATE_INSTRUCTOR_CQL_STMT);
+    createTable(InstructorCourse.CREATE_INSTRUCTOR_COURSES_CQL_STMT);
+  }
+
+  private void createTable(String cqlStatementString) {
+    if (!StringUtils.isEmpty(cqlStatementString)) {
+      session.execute(cqlStatementString);
+    }
   }
 
   public Student readStudent(String id) {

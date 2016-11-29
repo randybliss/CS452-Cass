@@ -15,6 +15,10 @@ public class Student {
 
   public static final String TABLE_NAME = "student";
 
+  public static final String CREATE_STUDENT_CQL_STMT = String.format(
+      "CREATE TABLE IF NOT EXISTS %1$s (ID TEXT, name TEXT, dept_name TEXT, tot_cred INT, PRIMARY KEY(ID))"
+      , TABLE_NAME);
+
   private String id;
   private String name;
   private String departmentName;

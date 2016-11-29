@@ -18,6 +18,12 @@ public class InstructorCourse {
 
   public static final String TABLE_NAME = "instructorCourses";
 
+  public static final String CREATE_INSTRUCTOR_COURSES_CQL_STMT = String.format(
+      "CREATE TABLE IF NOT EXISTS %1$s (" +
+          "ID TEXT, record_id TIMEUUID, course_id TEXT, sec_id TEXT, semester TEXT, year INT, " +
+          "PRIMARY KEY((ID), record_id))"
+      , TABLE_NAME);
+
   private String id;
   private UUID recordId;
   private String courseId;
