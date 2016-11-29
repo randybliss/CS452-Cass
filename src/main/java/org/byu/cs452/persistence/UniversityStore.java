@@ -69,17 +69,6 @@ public class UniversityStore {
     return students;
   }
 
-  @SuppressWarnings("WeakerAccess")
-  public void writeStudent(Student student) {
-    String cqlString = String.format("INSERT INTO %1$s (%2$s) VALUES(?,?,?,?)", Student.tableName(), Student.columnNames());
-    PreparedStatement preparedStatement = session.prepare(cqlString);
-    Statement insertStatement = preparedStatement.bind(student.getId(), student.getName(), student.getDepartmentName(), student.getTotalCredits());
-    ResultSet resultSet = session.execute(insertStatement);
-    if (!resultSet.wasApplied()) {
-      throw new RuntimeException("Insert student failed");
-    }
-  }
-
   public List<StudentCourse> readStudentCourses(String id) {
     List<StudentCourse> studentCourses = new ArrayList<>();
     String cqlString = String.format("SELECT %1$s FROM %2$s WHERE ID=?", StudentCourse.columnNames(), StudentCourse.tableName());
@@ -92,8 +81,17 @@ public class UniversityStore {
     return studentCourses;
   }
 
-  @SuppressWarnings("WeakerAccess")
-  public void writeStudentCourse(StudentCourse studentCourse) {
+  private void writeStudent(Student student) {
+    String cqlString = String.format("INSERT INTO %1$s (%2$s) VALUES(?,?,?,?)", Student.tableName(), Student.columnNames());
+    PreparedStatement preparedStatement = session.prepare(cqlString);
+    Statement insertStatement = preparedStatement.bind(student.getId(), student.getName(), student.getDepartmentName(), student.getTotalCredits());
+    ResultSet resultSet = session.execute(insertStatement);
+    if (!resultSet.wasApplied()) {
+      throw new RuntimeException("Insert student failed");
+    }
+  }
+
+  private void writeStudentCourse(StudentCourse studentCourse) {
     String cqlString = String.format("INSERT INTO %1$s (%2$s) VALUES(?,now(),?,?,?,?,?)", StudentCourse.tableName(), StudentCourse.columnNames());
     PreparedStatement preparedStatement = session.prepare(cqlString);
     Statement insertStatement = preparedStatement.bind(
@@ -109,30 +107,22 @@ public class UniversityStore {
     }
   }
 
+  //TODO: Implement readInstructor(String id) method - see readStudent(String id) method
   public Instructor readInstructor(String id) {
-    String cqlString = String.format("SELECT %1$s FROM %2$s WHERE id=?", Instructor.columnNames(), Instructor.tableName());
-    PreparedStatement preparedStatement = session.prepare(cqlString);
-    Statement selectStatement = preparedStatement.bind(id);
-    ResultSet resultSet = session.execute(selectStatement);
-    Row row = resultSet.one();
-    if (row == null) {
-      throw new RecordNotFoundException(String.format("Record not found for student id: %1$s", id));
-    }
-    return Instructor.getInstance(row);
+    return null;
   }
 
+  //TODO: Implement readInstructors() method  - see readStudents() method
   public List<Instructor> readInstructors() {
-    List<Instructor> instructors = new ArrayList<>();
-    String cqlString = String.format("SELECT %1$s FROM %2$s", Instructor.columnNames(), Instructor.tableName());
-    ResultSet resultSet = session.execute(cqlString);
-    for (Row row : resultSet) {
-      instructors.add(Instructor.getInstance(row));
-    }
-    return instructors;
+    return new ArrayList<>();
   }
 
-  @SuppressWarnings("WeakerAccess")
-  public void writeInstructor(Instructor instructor) {
+  //TODO: Implement readInstructorCourses(String id) - see readStudentCourses(String id) method
+  public List<InstructorCourse> readInstructorCourses(String id) {
+    return new ArrayList<>();
+  }
+
+  private void writeInstructor(Instructor instructor) {
     String cqlString = String.format("INSERT INTO %1$s (%2$s) VALUES(?,?,?,?)", Instructor.tableName(), Instructor.columnNames());
     PreparedStatement preparedStatement = session.prepare(cqlString);
     Statement insertStatement = preparedStatement.bind(instructor.getId(), instructor.getName(), instructor.getDepartmentName(), instructor.getSalary());
@@ -142,20 +132,7 @@ public class UniversityStore {
     }
   }
 
-  public List<InstructorCourse> readInstructorCourses(String id) {
-    List<InstructorCourse> instructorCourses = new ArrayList<>();
-    String cqlString = String.format("SELECT %1$s FROM %2$s WHERE ID=?", InstructorCourse.columnNames(), InstructorCourse.tableName());
-    PreparedStatement preparedStatement = session.prepare(cqlString);
-    Statement selectStatement = preparedStatement.bind(id);
-    ResultSet resultSet = session.execute(selectStatement);
-    for (Row row : resultSet) {
-      instructorCourses.add(InstructorCourse.getInstance(row));
-    }
-    return instructorCourses;
-  }
-
-  @SuppressWarnings("WeakerAccess")
-  public void writeInstructorCourse(InstructorCourse instructorCourse) {
+  private void writeInstructorCourse(InstructorCourse instructorCourse) {
     String cqlString = String.format("INSERT INTO %1$s (%2$s) VALUES(?,now(),?,?,?,?)", InstructorCourse.tableName(), InstructorCourse.columnNames());
     PreparedStatement preparedStatement = session.prepare(cqlString);
     Statement insertStatement = preparedStatement.bind(
@@ -172,7 +149,8 @@ public class UniversityStore {
 
   public String slurp() {
     slurpStudentData();
-    slurpInstructorData();
+    //TODO: after completing all other "TODO's" uncomment line below and run http://localhost:8080/slurp
+    //slurpInstructorData();
     return "SUCCESS";
   }
 

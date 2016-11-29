@@ -14,9 +14,9 @@ public class Instructor {
 
   public static final String TABLE_NAME = "instructor";
 
-  public static final String CREATE_INSTRUCTOR_CQL_STMT = String.format(
-      "CREATE TABLE IF NOT EXISTS %1$s (" +
-          "ID TEXT, name TEXT, dept_name TEXT, salary INT, PRIMARY KEY(ID))", TABLE_NAME);
+  //TODO: Replace empty string in statement below with create table statement modeled on Student create table statement
+  //TODO: Remember to replace 'tot_credits' attribute with 'salary'
+  public static final String CREATE_INSTRUCTOR_CQL_STMT = "";
 
   private String id;
   private String name;

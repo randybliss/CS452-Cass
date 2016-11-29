@@ -18,11 +18,10 @@ public class InstructorCourse {
 
   public static final String TABLE_NAME = "instructorCourses";
 
-  public static final String CREATE_INSTRUCTOR_COURSES_CQL_STMT = String.format(
-      "CREATE TABLE IF NOT EXISTS %1$s (" +
-          "ID TEXT, record_id TIMEUUID, course_id TEXT, sec_id TEXT, semester TEXT, year INT, " +
-          "PRIMARY KEY((ID), record_id))"
-      , TABLE_NAME);
+  /* TODO: replace empty string with create table statement modeled on StudentCourses create table statement
+   * TODO: remember, instructorCourse does not need 'grade' attribute
+   */
+  public static final String CREATE_INSTRUCTOR_COURSES_CQL_STMT = "";
 
   private String id;
   private UUID recordId;
