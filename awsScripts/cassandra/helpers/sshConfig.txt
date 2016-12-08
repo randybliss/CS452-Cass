@@ -1,0 +1,8 @@
+Host ip-*
+  User cassandra
+  IdentityFile ~/.ssh/id_cassandra
+  StrictHostKeyChecking no
+Host 10.*
+  User cassandra
+  IdentityFile ~/.ssh/id_cassandra
+  StrictHostKeyChecking no
